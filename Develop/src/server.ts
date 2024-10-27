@@ -239,9 +239,20 @@ inquirer
               message: 'What is the manager ID of the employee?',
             },
           ])
-          // .then((answers) => {
-          //   const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)`
-          // })
+          .then((answers) => {
+            const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+              VALUES ($1, $2, $3, $4)`;
+            const params = [answers.first_name, answers.last_name, answers.role_id, answers.manager_id];
+
+            pool.query(sql, params, (err, _result) => {
+              if (err) {
+                console.error(err.message);
+                return;
+              }
+              console.log('Employee added successfully');
+            });
+          });
+        break;
         }});
 
 app.listen(PORT, () => {
