@@ -198,6 +198,7 @@ const inquirerFunc = () => {
                 }
                 console.log('Department added successfully');
               });
+              inquirerFunc();
             });
           break;
         case 'Add a role':
@@ -230,6 +231,7 @@ const inquirerFunc = () => {
                   return;
                 }
                 console.log('Role added successfully');
+                inquirerFunc();
               });
             });
           break;
@@ -268,6 +270,7 @@ const inquirerFunc = () => {
                   return;
                 }
                 console.log('Employee added successfully');
+                inquirerFunc();
               });
             });
           break;
@@ -281,6 +284,7 @@ const inquirerFunc = () => {
             }
             console.table(result.rows);
           });
+          inquirerFunc();
           break;
         case 'View all roles':
           const sqlRoles = `SELECT id, title, salary, department_id FROM role`;
@@ -292,6 +296,7 @@ const inquirerFunc = () => {
             }
             console.table(result.rows);
           });
+          inquirerFunc();
           break;
         case 'View all employees':
           const sqlEmployees = `SELECT id, first_name, last_name, role_id, manager FROM employee`;
@@ -303,6 +308,7 @@ const inquirerFunc = () => {
             }
             console.table(result.rows);
           });
+          inquirerFunc();
           break;
         case 'Update an employee role':
           inquirer
@@ -330,6 +336,7 @@ const inquirerFunc = () => {
                   return;
                 }
                 console.log('Employee role updated successfully');
+                inquirerFunc();
               });
             });
           break;
