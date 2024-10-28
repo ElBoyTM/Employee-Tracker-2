@@ -270,8 +270,8 @@ const inquirerFunc = () => {
               value: row.id,
               }));
 
-              inquirer
-              .prompt([
+                inquirer
+                .prompt([
                 {
                 type: 'input',
                 name: 'first_name',
@@ -286,16 +286,16 @@ const inquirerFunc = () => {
                 type: 'list',
                 name: 'role_id',
                 message: 'What is the role of the employee?',
-                choices: roles, null: 'null',
+                choices: roles,
                 },
                 {
                 type: 'list',
                 name: 'manager',
                 message: 'Who is the manager of the employee?',
-                choices: employees,
+                choices: [...employees, { name: 'None', value: null }],
                 },
-              ])
-              .then((answers) => {
+                ])
+                .then((answers) => {
                 const sql = `INSERT INTO employee (first_name, last_name, role_id, manager)
                 VALUES ($1, $2, $3, $4)`;
                 const params = [answers.first_name, answers.last_name, answers.role_id, answers.manager];
@@ -308,7 +308,7 @@ const inquirerFunc = () => {
                 console.log('Employee added successfully');
                 inquirerFunc();
                 });
-              });
+                });
             });
             });
           break;
