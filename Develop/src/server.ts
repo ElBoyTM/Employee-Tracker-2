@@ -202,8 +202,19 @@ const inquirerFunc = () => {
             });
           break;
         case 'Add a role':
-          inquirer
-            .prompt([
+            // Fetch departments to provide as choices
+            pool.query('SELECT id, name FROM department', (err, result) => {
+            if (err) {
+              console.error(err.message);
+              return;
+            }
+            const departments = result.rows.map((row) => ({
+              name: row.name,
+              value: row.id,
+            }));
+
+            inquirer
+              .prompt([
               {
                 type: 'input',
                 name: 'title',
@@ -215,23 +226,25 @@ const inquirerFunc = () => {
                 message: 'What is the salary of the role?',
               },
               {
-                type: 'input',
+                type: 'list',
                 name: 'department_id',
-                message: 'What is the department ID of the role?',
+                message: 'Which department does the role belong to?',
+                choices: departments,
               },
-            ])
-            .then((answers) => {
+              ])
+              .then((answers) => {
               const sql = `INSERT INTO role (title, salary, department_id)
                 VALUES ($1, $2, $3)`;
               const params = [answers.title, answers.salary, answers.department_id];
 
               pool.query(sql, params, (err, _result) => {
                 if (err) {
-                  console.error(err.message);
-                  return;
+                console.error(err.message);
+                return;
                 }
                 console.log('Role added successfully');
                 inquirerFunc();
+              });
               });
             });
           break;
