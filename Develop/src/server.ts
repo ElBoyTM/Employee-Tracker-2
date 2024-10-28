@@ -172,7 +172,7 @@ const inquirerFunc = () => {
         type: 'list',
         name: 'action',
         message: 'What would you like to do?',
-        choices: ['Add a department', 'Add a role', 'Add an employee', 'View all departments', 'View all roles', 'View all employees', 'Update an employee role'],
+        choices: ['Add a department', 'Add a role', 'Add an employee', 'View all departments', 'View all roles', 'View all employees', 'Update an employee role', 'Exit'],
       },
     ])
     .then((answers) => {
@@ -402,6 +402,9 @@ const inquirerFunc = () => {
               });
             });
             });
+          break;
+        case 'Exit':
+          pool.end();
           break;
         default:
   }});
