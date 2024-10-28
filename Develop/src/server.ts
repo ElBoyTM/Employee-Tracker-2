@@ -249,42 +249,67 @@ const inquirerFunc = () => {
             });
           break;
         case 'Add an employee':
-          inquirer
-            .prompt([
-              {
+            // Fetch roles and employees to provide as choices
+            pool.query('SELECT id, title FROM role', (err, roleResult) => {
+            if (err) {
+              console.error(err.message);
+              return;
+            }
+            const roles = roleResult.rows.map((row) => ({
+              name: row.title,
+              value: row.id,
+            }));
+
+            pool.query('SELECT id, first_name, last_name FROM employee', (err, employeeResult) => {
+              if (err) {
+              console.error(err.message);
+              return;
+              }
+              const employees = employeeResult.rows.map((row) => ({
+              name: `${row.first_name} ${row.last_name}`,
+              value: row.id,
+              }));
+
+              inquirer
+              .prompt([
+                {
                 type: 'input',
                 name: 'first_name',
                 message: 'What is the first name of the employee?',
-              },
-              {
+                },
+                {
                 type: 'input',
                 name: 'last_name',
                 message: 'What is the last name of the employee?',
-              },
-              {
-                type: 'input',
+                },
+                {
+                type: 'list',
                 name: 'role_id',
-                message: 'What is the role ID of the employee?',
-              },
-              {
-                type: 'input',
+                message: 'What is the role of the employee?',
+                choices: roles, null: 'null',
+                },
+                {
+                type: 'list',
                 name: 'manager',
-                message: 'What is the manager ID of the employee?',
-              },
-            ])
-            .then((answers) => {
-              const sql = `INSERT INTO employee (first_name, last_name, role_id, manager)
+                message: 'Who is the manager of the employee?',
+                choices: employees,
+                },
+              ])
+              .then((answers) => {
+                const sql = `INSERT INTO employee (first_name, last_name, role_id, manager)
                 VALUES ($1, $2, $3, $4)`;
-              const params = [answers.first_name, answers.last_name, answers.role_id, answers.manager];
+                const params = [answers.first_name, answers.last_name, answers.role_id, answers.manager];
 
-              pool.query(sql, params, (err, _result) => {
+                pool.query(sql, params, (err, _result) => {
                 if (err) {
                   console.error(err.message);
                   return;
                 }
                 console.log('Employee added successfully');
                 inquirerFunc();
+                });
               });
+            });
             });
           break;
         case 'View all departments':
