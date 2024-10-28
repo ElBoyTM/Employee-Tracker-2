@@ -325,7 +325,11 @@ const inquirerFunc = () => {
           inquirerFunc();
           break;
         case 'View all roles':
-          const sqlRoles = `SELECT id, title, salary, department_id FROM role`;
+          const sqlRoles = `
+            SELECT role.id, role.title, role.salary, department.name AS department_name
+            FROM role
+            JOIN department ON role.department_id = department.id
+          `;
 
           pool.query(sqlRoles, (err, result) => {
             if (err) {
@@ -337,7 +341,17 @@ const inquirerFunc = () => {
           inquirerFunc();
           break;
         case 'View all employees':
-          const sqlEmployees = `SELECT id, first_name, last_name, role_id, manager FROM employee`;
+          const sqlEmployees = `
+            SELECT 
+              employee.id, 
+              employee.first_name, 
+              employee.last_name, 
+              role.title AS role, 
+              manager.first_name || ' ' || manager.last_name AS manager
+            FROM employee
+            LEFT JOIN role ON employee.role_id = role.id
+            LEFT JOIN employee AS manager ON employee.manager = manager.id
+          `;
 
           pool.query(sqlEmployees, (err, result) => {
             if (err) {
