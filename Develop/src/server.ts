@@ -57,9 +57,9 @@ const createRole = (req: express.Request, res: express.Response) => {
 
 // Create an employee
 const createEmployee = (req: express.Request, res: express.Response) => {
-  const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+  const sql = `INSERT INTO employee (first_name, last_name, role_id, manager)
     VALUES ($1, $2, $3, $4)`;
-  const params = [req.body.first_name, req.body.last_name, req.body.role_id, req.body.manager_id];
+  const params = [req.body.first_name, req.body.last_name, req.body.role_id, req.body.manager];
 
   pool.query(sql, params, (err, _result) => {
     if (err) {
@@ -118,7 +118,7 @@ const getRoles = (_req: express.Request, res: express.Response) => {
 
 // Read all employees
 const getEmployees = (_req: express.Request, res: express.Response) => {
-  const sql = `SELECT id, first_name, last_name, role_id, manager_id FROM employee`;
+  const sql = `SELECT id, first_name, last_name, role_id, manager FROM employee`;
 
   pool.query(sql, (err: Error, result: QueryResult) => {
     if (err) {
@@ -253,14 +253,14 @@ const inquirerFunc = () => {
               },
               {
                 type: 'input',
-                name: 'manager_id',
+                name: 'manager',
                 message: 'What is the manager ID of the employee?',
               },
             ])
             .then((answers) => {
-              const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+              const sql = `INSERT INTO employee (first_name, last_name, role_id, manager)
                 VALUES ($1, $2, $3, $4)`;
-              const params = [answers.first_name, answers.last_name, answers.role_id, answers.manager_id];
+              const params = [answers.first_name, answers.last_name, answers.role_id, answers.manager];
 
               pool.query(sql, params, (err, _result) => {
                 if (err) {
@@ -294,7 +294,7 @@ const inquirerFunc = () => {
           });
           break;
         case 'View all employees':
-          const sqlEmployees = `SELECT id, first_name, last_name, role_id, manager_id FROM employee`;
+          const sqlEmployees = `SELECT id, first_name, last_name, role_id, manager FROM employee`;
 
           pool.query(sqlEmployees, (err, result) => {
             if (err) {
