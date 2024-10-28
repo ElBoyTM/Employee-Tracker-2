@@ -14,10 +14,10 @@ app.use(express.json());
 // -- Create functions -- //
 
 // Create a department
-app.post('/api/new-department', ({ body }, res) => {
+const createDepartment = (req: express.Request, res: express.Response) => {
   const sql = `INSERT INTO department (name)
     VALUES ($1)`;
-  const params = [body.name];
+  const params = [req.body.name];
 
   pool.query(sql, params, (err, _result) => {
     if (err) {
@@ -26,16 +26,19 @@ app.post('/api/new-department', ({ body }, res) => {
     }
     res.json({
       message: 'success',
-      data: body,
+      data: req.body,
     });
-  });
-});
+    });
+    };
+
+    app.post('/api/new-department', createDepartment
+);
 
 // Create a role
-app.post('/api/new-role', ({ body }, res) => {
+const createRole = (req: express.Request, res: express.Response) => {
   const sql = `INSERT INTO role (title, salary, department_id)
     VALUES ($1, $2, $3)`;
-  const params = [body.title, body.salary, body.department_id];
+  const params = [req.body.title, req.body.salary, req.body.department_id];
 
   pool.query(sql, params, (err, _result) => {
     if (err) {
@@ -44,16 +47,19 @@ app.post('/api/new-role', ({ body }, res) => {
     }
     res.json({
       message: 'success',
-      data: body,
+      data: req.body,
     });
   });
-});
+  };
+
+  app.post('/api/new-role', createRole
+);
 
 // Create an employee
-app.post('/api/new-employee', ({ body }, res) => {
+const createEmployee = (req: express.Request, res: express.Response) => {
   const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
     VALUES ($1, $2, $3, $4)`;
-  const params = [body.first_name, body.last_name, body.role_id, body.manager_id];
+  const params = [req.body.first_name, req.body.last_name, req.body.role_id, req.body.manager_id];
 
   pool.query(sql, params, (err, _result) => {
     if (err) {
@@ -62,15 +68,18 @@ app.post('/api/new-employee', ({ body }, res) => {
     }
     res.json({
       message: 'success',
-      data: body,
+      data: req.body,
     });
   });
-});
+  };
+
+  app.post('/api/new-employee', createEmployee
+);
 
 // -- Read functions -- //
 
 // Read all departments
-app.get('/api/departments', (_req, res) => {
+const getDepartments = (_req: express.Request, res: express.Response) => {
   const sql = `SELECT id, name FROM department`;
 
   pool.query(sql, (err: Error, result: QueryResult) => {
@@ -84,10 +93,12 @@ app.get('/api/departments', (_req, res) => {
       data: rows,
     });
   });
-});
+
+  app.get('/api/departments', getDepartments)
+};
 
 // Read all roles
-app.get('/api/roles', (_req, res) => {
+const getRoles = (_req: express.Request, res: express.Response) => {
   const sql = `SELECT id, title, salary, department_id FROM role`;
 
   pool.query(sql, (err: Error, result: QueryResult) => {
@@ -101,10 +112,12 @@ app.get('/api/roles', (_req, res) => {
       data: rows,
     });
   });
-});
+
+  app.get('/api/roles', getRoles)
+};
 
 // Read all employees
-app.get('/api/employees', (_req, res) => {
+const getEmployees = (_req: express.Request, res: express.Response) => {
   const sql = `SELECT id, first_name, last_name, role_id, manager_id FROM employee`;
 
   pool.query(sql, (err: Error, result: QueryResult) => {
@@ -118,16 +131,18 @@ app.get('/api/employees', (_req, res) => {
       data: rows,
     });
   });
-});
+
+  app.get('/api/employees', getEmployees)
+};
 
 // -- Update function -- //
 
 // Update an employee's role
-app.put('/api/update-employee-role/:id', ({ body, params }, res) => {
+const updateEmployeeRole = (req: express.Request, res: express.Response) => {
   const sql = `UPDATE employee
     SET role_id = $1
     WHERE id = $2`;
-  const paramsArr = [body.role_id, params.id];
+  const paramsArr = [req.body.role_id, req.params.id];
 
   pool.query(sql, paramsArr, (err, result) => {
     if (err) {
@@ -140,120 +155,126 @@ app.put('/api/update-employee-role/:id', ({ body, params }, res) => {
       res.json({
         message: 'success',
         changes: result.rowCount,
-        id: params.id,
+        id: req.params.id,
       });
     }
   });
-});
+
+  app.put('/api/update-employee-role/:id', updateEmployeeRole)
+};
 
 // --Inquirer-- //
 
-inquirer
-  .prompt([
-    {
-      type: 'list',
-      name: 'action',
-      message: 'What would you like to do?',
-      choices: ['Add a department', 'Add a role', 'Add an employee', 'View all departments', 'View all roles', 'View all employees', 'Update an employee role'],
-    },
-  ])
-  .then((answers) => {
-    switch (answers.action) {
-      case 'Add a department':
-        inquirer
-          .prompt([
-            {
-              type: 'input',
-              name: 'name',
-              message: 'What is the name of the department?',
-            },
-          ])
-          .then((answers) => {
-            const sql = `INSERT INTO department (name)
-              VALUES ($1)`;
-            const params = [answers.name];
+const inquirerFunc = () => {
+  inquirer
+    .prompt([
+      {
+        type: 'list',
+        name: 'action',
+        message: 'What would you like to do?',
+        choices: ['Add a department', 'Add a role', 'Add an employee', 'View all departments', 'View all roles', 'View all employees', 'Update an employee role'],
+      },
+    ])
+    .then((answers) => {
+      switch (answers.action) {
+        case 'Add a department':
+          inquirer
+            .prompt([
+              {
+                type: 'input',
+                name: 'name',
+                message: 'What is the name of the department?',
+              },
+            ])
+            .then((answers) => {
+              const sql = `INSERT INTO department (name)
+                VALUES ($1)`;
+              const params = [answers.name];
 
-            pool.query(sql, params, (err, _result) => {
-              if (err) {
-                console.error(err.message);
-                return;
-              }
-              console.log('Department added successfully');
+              pool.query(sql, params, (err, _result) => {
+                if (err) {
+                  console.error(err.message);
+                  return;
+                }
+                console.log('Department added successfully');
+              });
             });
-          });
-        break;
-      case 'Add a role':
-        inquirer
-          .prompt([
-            {
-              type: 'input',
-              name: 'title',
-              message: 'What is the title of the role?',
-            },
-            {
-              type: 'input',
-              name: 'salary',
-              message: 'What is the salary of the role?',
-            },
-            {
-              type: 'input',
-              name: 'department_id',
-              message: 'What is the department ID of the role?',
-            },
-          ])
-          .then((answers) => {
-            const sql = `INSERT INTO role (title, salary, department_id)
-              VALUES ($1, $2, $3)`;
-            const params = [answers.title, answers.salary, answers.department_id];
+          break;
+        case 'Add a role':
+          inquirer
+            .prompt([
+              {
+                type: 'input',
+                name: 'title',
+                message: 'What is the title of the role?',
+              },
+              {
+                type: 'input',
+                name: 'salary',
+                message: 'What is the salary of the role?',
+              },
+              {
+                type: 'input',
+                name: 'department_id',
+                message: 'What is the department ID of the role?',
+              },
+            ])
+            .then((answers) => {
+              const sql = `INSERT INTO role (title, salary, department_id)
+                VALUES ($1, $2, $3)`;
+              const params = [answers.title, answers.salary, answers.department_id];
 
-            pool.query(sql, params, (err, _result) => {
-              if (err) {
-                console.error(err.message);
-                return;
-              }
-              console.log('Role added successfully');
+              pool.query(sql, params, (err, _result) => {
+                if (err) {
+                  console.error(err.message);
+                  return;
+                }
+                console.log('Role added successfully');
+              });
             });
-          });
-        break;
-      case 'Add an employee':
-        inquirer
-          .prompt([
-            {
-              type: 'input',
-              name: 'first_name',
-              message: 'What is the first name of the employee?',
-            },
-            {
-              type: 'input',
-              name: 'last_name',
-              message: 'What is the last name of the employee?',
-            },
-            {
-              type: 'input',
-              name: 'role_id',
-              message: 'What is the role ID of the employee?',
-            },
-            {
-              type: 'input',
-              name: 'manager_id',
-              message: 'What is the manager ID of the employee?',
-            },
-          ])
-          .then((answers) => {
-            const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
-              VALUES ($1, $2, $3, $4)`;
-            const params = [answers.first_name, answers.last_name, answers.role_id, answers.manager_id];
+          break;
+        case 'Add an employee':
+          inquirer
+            .prompt([
+              {
+                type: 'input',
+                name: 'first_name',
+                message: 'What is the first name of the employee?',
+              },
+              {
+                type: 'input',
+                name: 'last_name',
+                message: 'What is the last name of the employee?',
+              },
+              {
+                type: 'input',
+                name: 'role_id',
+                message: 'What is the role ID of the employee?',
+              },
+              {
+                type: 'input',
+                name: 'manager_id',
+                message: 'What is the manager ID of the employee?',
+              },
+            ])
+            .then((answers) => {
+              const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+                VALUES ($1, $2, $3, $4)`;
+              const params = [answers.first_name, answers.last_name, answers.role_id, answers.manager_id];
 
-            pool.query(sql, params, (err, _result) => {
-              if (err) {
-                console.error(err.message);
-                return;
-              }
-              console.log('Employee added successfully');
+              pool.query(sql, params, (err, _result) => {
+                if (err) {
+                  console.error(err.message);
+                  return;
+                }
+                console.log('Employee added successfully');
+              });
             });
-          });
-        break;
-        }});
+          break;
+  }});
+};
+
+inquirerFunc();
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
