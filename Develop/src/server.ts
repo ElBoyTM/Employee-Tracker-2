@@ -271,6 +271,69 @@ const inquirerFunc = () => {
               });
             });
           break;
+        case 'View all departments':
+          const sqlDepartments = `SELECT id, name FROM department`;
+
+          pool.query(sqlDepartments, (err, result) => {
+            if (err) {
+              console.error(err.message);
+              return;
+            }
+            console.table(result.rows);
+          });
+          break;
+        case 'View all roles':
+          const sqlRoles = `SELECT id, title, salary, department_id FROM role`;
+
+          pool.query(sqlRoles, (err, result) => {
+            if (err) {
+              console.error(err.message);
+              return;
+            }
+            console.table(result.rows);
+          });
+          break;
+        case 'View all employees':
+          const sqlEmployees = `SELECT id, first_name, last_name, role_id, manager_id FROM employee`;
+
+          pool.query(sqlEmployees, (err, result) => {
+            if (err) {
+              console.error(err.message);
+              return;
+            }
+            console.table(result.rows);
+          });
+          break;
+        case 'Update an employee role':
+          inquirer
+            .prompt([
+              {
+                type: 'input',
+                name: 'role_id',
+                message: 'What is the new role ID of the employee?',
+              },
+              {
+                type: 'input',
+                name: 'id',
+                message: 'What is the ID of the employee?',
+              },
+            ])
+            .then((answers) => {
+              const sql = `UPDATE employee
+                SET role_id = $1
+                WHERE id = $2`;
+              const paramsArr = [answers.role_id, answers.id];
+
+              pool.query(sql, paramsArr, (err, _result) => {
+                if (err) {
+                  console.error(err.message);
+                  return;
+                }
+                console.log('Employee role updated successfully');
+              });
+            });
+          break;
+        default:
   }});
 };
 
