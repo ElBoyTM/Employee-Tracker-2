@@ -25,6 +25,8 @@
   ## Usage
   See video:
 
+  https://drive.google.com/file/d/1El8bXvLPKv72mgTL7Q3_u0Q_dcpbZBrS/view
+
   ## Contributing
   Feel free to contribute to this project. The code could stand to be modularized, and there is no delete function yet. Currently, the only way to delete anything is to rerun schema.sql, but this deletes everything.
 
